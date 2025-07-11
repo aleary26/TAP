@@ -153,7 +153,6 @@ const PromptSelector: React.FC = () => {
         </div>
       </div>
 
-      {/* Active Prompt Display */}
       {activePrompt ? (
         <div className="border rounded-lg p-4 bg-gray-50">
           <div className="flex items-center justify-between mb-2">

@@ -38,7 +38,6 @@ const ArgumentCard: React.FC<ArgumentCardProps> = ({ argument }) => {
     <div
       className={`border rounded-lg p-6 border-l-4 ${getConfidenceBorderColor()}`}
     >
-      {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-2">
           <span
@@ -58,7 +57,6 @@ const ArgumentCard: React.FC<ArgumentCardProps> = ({ argument }) => {
         </span>
       </div>
 
-      {/* Main Argument */}
       <div className="mb-4">
         <h4 className="text-lg font-semibold text-gray-900 mb-2">
           Main Argument
@@ -66,7 +64,6 @@ const ArgumentCard: React.FC<ArgumentCardProps> = ({ argument }) => {
         <p className="text-gray-800 leading-relaxed text-left">{argument.argument}</p> 
       </div>
 
-      {/* Supporting Claims */}
       {argument.supportingClaims.length > 0 && (
         <div className="mb-4 p-4 bg-green-50 rounded-lg">
           <h5 className="text-sm font-semibold text-green-800 mb-2 flex items-center">
@@ -87,7 +84,6 @@ const ArgumentCard: React.FC<ArgumentCardProps> = ({ argument }) => {
         </div>
       )}
 
-      {/* Qualifiers */}
       {argument.qualifiers.length > 0 && (
         <div className="mb-4 p-4 bg-yellow-50 rounded-lg">
           <h5 className="text-sm font-semibold text-yellow-800 mb-2 flex items-center">
@@ -108,7 +104,6 @@ const ArgumentCard: React.FC<ArgumentCardProps> = ({ argument }) => {
         </div>
       )}
 
-      {/* Logical Framework */}
       {argument.logicalFramework.length > 0 && (
         <div className="mb-4 p-4 bg-blue-50 rounded-lg">
           <h5 className="text-sm font-semibold text-blue-800 mb-3 flex items-center">
@@ -133,7 +128,6 @@ const ArgumentCard: React.FC<ArgumentCardProps> = ({ argument }) => {
         </div>
       )}
 
-      {/* Model Assessment */}
       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
         <h5 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
           <Brain className="h-4 w-4 mr-1" />

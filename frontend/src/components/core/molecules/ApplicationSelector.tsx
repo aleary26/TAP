@@ -3,7 +3,6 @@ import { Brain, ChevronDown } from "lucide-react";
 import type { ApplicationType } from "@/types/analysis";
 import { useApplications } from "@/contexts/PlatformContext";
 
-// Application display information
 const APPLICATION_INFO: Record<ApplicationType, {
     title: string;
     description: string;
@@ -81,7 +80,6 @@ const ApplicationSelector: React.FC = () => {
                 </div>
             </div>
 
-            {/* Active Application Display */}
             <div className="border rounded-lg p-4 bg-purple-50">
                 <div className="flex items-center justify-start space-x-3">
                     <span className="text-3xl">{activeAppInfo.icon}</span>
