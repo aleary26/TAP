@@ -1,0 +1,20 @@
+  {
+    "name": "argument_analysis",
+    "title": "Argument Analysis Prompt",
+    "description": "Extracts and analyzes arguments from text, identifying supporting claims, qualifiers, and logical structure",
+    "application": "argument_analysis",
+    "input_variables": [
+      "text"
+    ],
+    "template": "Analyze the following text to extract and evaluate the arguments being made. For each argument you identify, provide:\n\n1. The main argument statement\n2. Supporting claims that back up the argument\n3. Any qualifiers or limitations mentioned\n4. A logical framework showing the reasoning structure\n5. Your assessment of argument quality and evidence\n\nText to analyze: {text}\n\nProvide your analysis in the following JSON format:\n{{\n    \"arguments\": [\n        {{\n            \"argument\": \"The main argument being made\",\n            \"supporting_claims\": [\"claim 1\", \"claim 2\", \"claim 3\"],\n            \"qualifiers\": [\"qualifier 1\", \"qualifier 2\"],\n            \"logical_framework\": [\n                {{\"step_number\": \"1\", \"statement\": \"First premise\"}},\n                {{\"step_number\": \"2\", \"statement\": \"Second premise\"}},\n                {{\"step_number\": \"∴\", \"statement\": \"Therefore, conclusion\"}}\n            ],\n            \"model_assessment\": \"Assessment of argument quality, evidence, and logical structure\",\n            \"confidence_score\": 0.85\n        }}\n    ],\n    \"overall_assessment\": \"Overall evaluation of the text's argumentation\",\n    \"credibility_score\": 0.75,\n    \"argument_count\": 1,\n    \"well_supported_arguments\": 1\n}}\n\nFocus on identifying clear argumentative claims rather than simple factual statements. Look for:\n- Claims that can be disputed or supported with evidence\n- Logical reasoning chains\n- Causal relationships\n- Predictions or recommendations\n- Value judgments backed by reasoning\n\nProvide your own calculated confidence scores based on:\n- Clarity of the argument\n- Quality of supporting evidence\n- Logical coherence\n- Potential for verification\n- If your credebility_score is below 0.85, include what could be done to improve confidence in the overall_assessment.",
+    "version": "1.0.0",
+    "preferred_models": [
+      "phi4:14b",
+      "llama2:7b"
+    ],
+    "tags": [
+      "general",
+      "argument",
+      "analysis"
+    ]
+  }
