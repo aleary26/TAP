@@ -5,9 +5,11 @@ import {
   AlertTriangle,
   Brain,
   List,
-  ArrowRight,
 } from "lucide-react";
 import type { Argument } from "@/types/argument-analysis";
+import HighlightCard from "@/components/core/atoms/HighlightCard";
+import BulletList from "@/components/core/atoms/BulletList";
+import LogicalFrameworkList from "@/components/apps/argument_analysis/molecules/LogicalFrameworkList";
 
 interface ArgumentCardProps {
   argument: Argument;
@@ -65,78 +67,53 @@ const ArgumentCard: React.FC<ArgumentCardProps> = ({ argument }) => {
       </div>
 
       {argument.supportingClaims.length > 0 && (
-        <div className="mb-4 p-4 bg-green-50 rounded-lg">
-          <h5 className="text-sm font-semibold text-green-800 mb-2 flex items-center">
-            <TrendingUp className="h-4 w-4 mr-1" />
-            Supporting Claims ({argument.supportingClaims.length})
-          </h5>
-          <ul className="space-y-2">
-            {argument.supportingClaims.map((claim, index) => (
-              <li
-                key={index}
-                className="text-sm text-green-700 flex items-start"
-              >
-                <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                {claim}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <HighlightCard 
+          title={`Supporting Claims (${argument.supportingClaims.length})`} 
+          color="green" 
+          icon={<TrendingUp className="h-4 w-4 mr-1" />}
+        >
+          <BulletList
+            items={argument.supportingClaims}
+            bulletColor="bg-green-500"
+            textColor="text-green-700"
+          />
+        </HighlightCard>
       )}
 
       {argument.qualifiers.length > 0 && (
-        <div className="mb-4 p-4 bg-yellow-50 rounded-lg">
-          <h5 className="text-sm font-semibold text-yellow-800 mb-2 flex items-center">
-            <AlertTriangle className="h-4 w-4 mr-1" />
-            Qualifiers & Limitations ({argument.qualifiers.length})
-          </h5>
-          <ul className="space-y-2">
-            {argument.qualifiers.map((qualifier, index) => (
-              <li
-                key={index}
-                className="text-sm text-yellow-700 flex items-start"
-              >
-                <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                {qualifier}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <HighlightCard 
+          title={`Qualifiers & Limitations (${argument.qualifiers.length})`} 
+          color="yellow" 
+          icon={<AlertTriangle className="h-4 w-4 mr-1" />}
+        >
+          <BulletList
+            items={argument.qualifiers}
+            bulletColor="bg-yellow-500"
+            textColor="text-yellow-700"
+          />
+        </HighlightCard>
       )}
 
       {argument.logicalFramework.length > 0 && (
-        <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-          <h5 className="text-sm font-semibold text-blue-800 mb-3 flex items-center">
-            <List className="h-4 w-4 mr-1" />
-            Logical Framework
-          </h5>
-          <div className="space-y-3">
-            {argument.logicalFramework.map((step, index) => (
-              <div key={index} className="flex items-start space-x-3">
-                <div className="flex items-center justify-center w-6 h-6 bg-blue-200 text-blue-800 rounded-full text-xs font-semibold flex-shrink-0">
-                  {step.stepNumber}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-blue-700 text-left">{step.statement}</p> 
-                </div>
-                {index < argument.logicalFramework.length - 1 && (
-                  <ArrowRight className="h-4 w-4 text-blue-400 flex-shrink-0 mt-0.5" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        <HighlightCard 
+          title="Logical Framework" 
+          color="blue" 
+          icon={<List className="h-4 w-4 mr-1" />}
+        >
+          <LogicalFrameworkList
+            steps={argument.logicalFramework}
+            stepColor="bg-blue-200 text-blue-800"
+            textColor="text-blue-700"
+            arrowColor="text-blue-400"
+          />
+        </HighlightCard>
       )}
 
-      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-        <h5 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-          <Brain className="h-4 w-4 mr-1" />
-          AI Assessment
-        </h5>
+      <HighlightCard title="AI Assessment" color="gray" icon={<Brain className="h-4 w-4 mr-1" />}>
         <p className="text-sm text-gray-700 leading-relaxed text-left">
           {argument.modelAssessment}
         </p>
-      </div>
+      </HighlightCard>
     </div>
   );
 };
