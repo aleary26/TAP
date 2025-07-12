@@ -5,11 +5,11 @@ import LGTextInputCard from '@/components/core/organisms/LGTextInputCard';
 import ReadyDisplayCard from '@/components/apps/argument_analysis/molecules/ReadyDisplayCard';
 import TabbedArgumentAnalysisResults from '@/components/apps/argument_analysis/organisms/TabbedArgumentAnalysisResults';
 
-interface ApplicationWrapperComponentProps {
+interface ApplicationWrapperProps {
   onError: (error: string) => void;
 }
 
-const ApplicationWrapperComponent: React.FC<ApplicationWrapperComponentProps> = ({ onError }) => {
+const ApplicationWrapper: React.FC<ApplicationWrapperProps> = ({ onError }) => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { activeApplicationType } = useApplications();
@@ -74,4 +74,4 @@ const ApplicationWrapperComponent: React.FC<ApplicationWrapperComponentProps> = 
   );
 };
 
-export default ApplicationWrapperComponent; 
+export default ApplicationWrapper; 

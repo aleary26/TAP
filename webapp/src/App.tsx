@@ -4,7 +4,7 @@ import AppHeader from "@/components/core/atoms/AppHeader";
 import AppFooter from "@/components/core/atoms/AppFooter";
 import ErrorDisplay from "@/components/core/molecules/ErrorDisplay";
 import PlatformSelector from "@/components/core/organisms/PlatformSelector";
-import ApplicationWrapperComponent from "@/components/core/organisms/ApplicationWrapperComponent";
+import ApplicationWrapper from "@/components/core/organisms/ApplicationWrapper";
 
 import "./App.css";
 
@@ -28,7 +28,7 @@ function App() {
             <PlatformSelector />
           </div>
           
-          <ApplicationWrapperComponent onError={handleError} />
+          <ApplicationWrapper onError={handleError} />
         </div>
         <AppFooter />
       </div>
