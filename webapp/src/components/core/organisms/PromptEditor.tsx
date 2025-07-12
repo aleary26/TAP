@@ -64,7 +64,7 @@ const PromptEditor: React.FC<PromptEditorProps> = ({
     // verify that the template contains a JSON object, and allow the response failing
     // to indicate that the template provided is invalid.
     if (!textContainsJson(formData.template)) {
-      errors.push("Prompt template must contain a valid JSON object defining the expected output format. For an example of what's expected, review backend/prompts/example/argument_analysis.json");
+      errors.push("Prompt template must contain a valid JSON object defining the expected output format. For an example of what's expected, review api/prompts/example/argument_analysis.json");
     }
     return {
       isValid: errors.length === 0,

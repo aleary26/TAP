@@ -41,14 +41,14 @@ This project was built to gain hands-on experience with:
 
 ## 🛠️ Tech Stack
 
-### Frontend
+### Webapp
 - **React 19** with TypeScript - Modern React with latest features
 - **Vite** - For development and building
 - **Tailwind CSS** - UI development  
 - **Recharts** - Responsive charts and visualizations
 - **Lucide React** - Icons
 
-### Backend  
+### Api  
 - **FastAPI** - High-performance Python web framework for API development
 - **Pydantic** - Data validation and serialization
 - **Uvicorn** - ASGI web server
@@ -84,7 +84,7 @@ Ensure you have the following installed:
 
 2. **API Setup**:
    ```bash
-   cd backend
+   cd api
    
    # Create virtual environment
    python -m venv venv
@@ -101,7 +101,7 @@ Ensure you have the following installed:
 
 3. **Frontend Setup**:
    ```bash
-   cd ../frontend
+   cd ../webapp
    npm install
    ```
 
@@ -109,26 +109,26 @@ Ensure you have the following installed:
 1. **Get started with an example prompt** (optional)
    ```bash
    # Copy example prompts to working directory
-   cd backend
+   cd api
    cp -r prompts/example/* prompts/
    ```
 
-2. **Start the backend** (in `backend/` directory):
+2. **Start the backend** (in `api/` directory):
    ```bash
    # Make sure virtual environment is activated
    python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000 
    ```
-   Backend will be available at: http://localhost:8000
+   API will be available at: http://localhost:8000
    
    API Documentation: http://localhost:8000/docs
 
    ![API Docs](/assets/screenshots/api_docs.png)
 
-3. **Start the frontend** (in a separate terminal and from the `frontend/` directory):
+3. **Start the webapp** (in a separate terminal and from the `webapp/` directory):
    ```bash
    npm run dev
    ```
-   Frontend will be available at: http://localhost:3000
+   Webapp will be available at: http://localhost:3000
 
 ## 📖 Usage Example
 

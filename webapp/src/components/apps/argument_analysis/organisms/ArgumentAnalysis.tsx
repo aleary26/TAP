@@ -10,6 +10,7 @@ import {
 import type { ArgumentAnalysisResult } from "@/types/argument-analysis";
 import ArgumentCard from "@/components/apps/argument_analysis/molecules/ArgumentCard";
 import MetricCard from "@/components/core/atoms/MetricCard";
+import HighlightCard from "@/components/core/atoms/HighlightCard";
 
 interface ArgumentAnalysisResultsProps {
   modelUsed: string;
@@ -79,17 +80,12 @@ const ArgumentAnalysis: React.FC<ArgumentAnalysisResultsProps> = ({
 
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <Brain className="h-5 w-5 text-gray-600" />
-            <span className="font-medium text-gray-900">
-              Overall Assessment
-            </span>
-          </div>
+        <HighlightCard title="Overall Assessment" color="gray" icon={<Brain className="h-4 w-4 mr-1" />}>
           <p className="text-gray-700 leading-relaxed text-left">
             {result.overallAssessment}
           </p>
-        </div>
+        </HighlightCard>
+        
       </div>
 
       {result.arguments.length > 0 && (
