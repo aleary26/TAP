@@ -1,18 +1,13 @@
 import React, { useState, useMemo } from "react";
 import type { Prompt } from "@/types/prompts";
-import { apiService } from "@/services/api";
-import { usePrompts, useApplications, useModels } from "@/contexts/PlatformContext";
-import PromptEditor from "@/components/core/organisms/PromptEditor";
+import { usePrompts, useApplications, usePlatformContext } from "@/contexts/PlatformContext";
 import { ChevronDown } from "lucide-react";
 
 const PromptSelector: React.FC = () => {
-  const { prompts, activePromptName, setActivePrompt, refreshPrompts } = usePrompts();
+  const { prompts, activePromptName, setActivePrompt } = usePrompts();
   const { activeApplicationType } = useApplications();
-  const { models } = useModels();
+  const { startEditingPrompt } = usePlatformContext();
   const [showDropdown, setShowDropdown] = useState(false);
-  const [showPromptEditor, setShowPromptEditor] = useState(false);
-  const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
-  const [isCreatingPrompt, setIsCreatingPrompt] = useState(false);
 
   const filteredPrompts = useMemo(
     () => prompts.filter((prompt) => prompt.application === activeApplicationType),
@@ -30,46 +25,10 @@ const PromptSelector: React.FC = () => {
   };
 
   const handlePromptEdit = (prompt: Prompt | null) => {
-    setEditingPrompt(prompt);
-    setIsCreatingPrompt(prompt === null);
-    setShowPromptEditor(true);
+    startEditingPrompt(prompt, prompt === null);
   };
 
-  const handlePromptSave = async (prompt: Prompt) => {
-    try {
-      if (isCreatingPrompt) {
-        await apiService.createPrompt(prompt);
-      } else {
-        await apiService.updatePrompt(prompt);
-      }
-      await refreshPrompts();
-      setShowPromptEditor(false);
-      setEditingPrompt(null);
-      setIsCreatingPrompt(false);
-    } catch (error) {
-      console.error("Failed to save prompt: ", error);
-    }
-  };
-
-  const handlePromptEditCancel = () => {
-    setShowPromptEditor(false);
-    setEditingPrompt(null);
-    setIsCreatingPrompt(false);
-  };
-
-  if (showPromptEditor) {
-    return (
-      <div className="fixed inset-0 bg-gray-50 z-50 overflow-auto">
-        <PromptEditor
-          prompt={editingPrompt}
-          isCreating={isCreatingPrompt}
-          availableModels={models}
-          onSave={handlePromptSave}
-          onCancel={handlePromptEditCancel}
-        />
-      </div>
-    );
-  }
+  // Don't render prompt editor here anymore - it will be handled by the main app layout
 
   return (
     <div className="mb-6">

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import type { AnalysisResponse } from '@/types/analysis';
-import { useApplications } from '@/contexts/PlatformContext';
+import { useApplications, useModels, usePlatformContext } from '@/contexts/PlatformContext';
 import LGTextInputCard from '@/components/core/organisms/LGTextInputCard';
 import ReadyDisplayCard from '@/components/apps/argument_analysis/molecules/ReadyDisplayCard';
 import TabbedArgumentAnalysisResults from '@/components/apps/argument_analysis/organisms/TabbedArgumentAnalysisResults';
+import PromptEditor from '@/components/core/organisms/PromptEditor';
 
 interface ApplicationWrapperProps {
   onError: (error: string) => void;
@@ -13,6 +14,8 @@ const ApplicationWrapper: React.FC<ApplicationWrapperProps> = ({ onError }) => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { activeApplicationType } = useApplications();
+  const { models } = useModels();
+  const { state, stopEditingPrompt, savePrompt } = usePlatformContext();
 
   const handleAnalysisStart = () => {
     setIsAnalyzing(true);
@@ -53,6 +56,21 @@ const ApplicationWrapper: React.FC<ApplicationWrapperProps> = ({ onError }) => {
   };
 
   const appConfig = getApplicationConfig();
+
+  // If prompt editing is active, show the prompt editor instead of normal content
+  if (state.isEditingPrompt) {
+    return (
+      <div className="lg:col-span-2">
+        <PromptEditor
+          prompt={state.editingPrompt}
+          isCreating={state.isCreatingPrompt}
+          availableModels={models}
+          onSave={savePrompt}
+          onCancel={stopEditingPrompt}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="lg:col-span-2 space-y-6">

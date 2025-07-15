@@ -21,6 +21,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
     const [editingHyperparameters, setEditingHyperparameters] = useState<ModelHyperparameters | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
     const [isResetting, setIsResetting] = useState(false);
+    const [hasEditsThisSession, setHasEditsThisSession] = useState(false);
 
     let displayItems = [];
     
@@ -53,6 +54,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
                 await updateModel(model.name, editingHyperparameters);
                 setIsEditing(false);
                 setEditingHyperparameters(null);
+                setHasEditsThisSession(true);
             } catch (error) {
                 console.error('Failed to update model:', error);
             } finally {
@@ -65,6 +67,7 @@ const ModelCard: React.FC<ModelCardProps> = ({
         setIsResetting(true);
         try {
             await resetModel(model.name);
+            setHasEditsThisSession(false);
         } catch (error) {
             console.error('Failed to reset model:', error);
         } finally {
@@ -111,14 +114,16 @@ const ModelCard: React.FC<ModelCardProps> = ({
                                 <Edit size={14} />
                                 <span>Edit</span>
                             </button>
-                            <button
-                                onClick={handleReset}
-                                className="text-sm text-orange-600 hover:text-orange-800 flex items-center space-x-1"
-                                disabled={isResetting || !modelInfo}
-                            >
-                                <RotateCcw size={14} />
-                                <span>{isResetting ? 'Resetting...' : 'Reset'}</span>
-                            </button>
+                            {hasEditsThisSession && (
+                                <button
+                                    onClick={handleReset}
+                                    className="text-sm text-orange-600 hover:text-orange-800 flex items-center space-x-1"
+                                    disabled={isResetting || !modelInfo}
+                                >
+                                    <RotateCcw size={14} />
+                                    <span>{isResetting ? 'Resetting...' : 'Reset'}</span>
+                                </button>
+                            )}
                         </>
                     )}
                     {isEditing && (
@@ -142,29 +147,24 @@ const ModelCard: React.FC<ModelCardProps> = ({
                     )}
                 </div>
             </div>
-            
-            <div className="text-sm text-blue-700 mb-3">
-                {model.description}
-            </div>
-            
+                        
             <div className="flex items-center space-x-4 text-xs text-blue-600 mb-4">
-                <span>Version: {model.version}</span>
                 {displayItems.length > 0 && (
                     <span>{displayItems.join(" • ")}</span>
                 )}
             </div>
 
             {modelInfo && (
-                <div className="bg-white rounded-lg p-3">
+                <div className="border border-blue-200 rounded-lg p-3">
                     <div className="flex items-center space-x-2 mb-3">
                         <Settings size={16} className="text-blue-600" />
                         <span className="font-medium text-blue-900">Hyperparameters</span>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm">
                         {/* Temperature */}
-                        <div>
-                            <label className="block text-gray-700 font-medium mb-1">Temperature</label>
+                        <div className="flex items-center">
+                            <label className="text-gray-700 font-medium flex-1 text-left">Temperature:</label>
                             {isEditing ? (
                                 <input
                                     type="number"
@@ -173,17 +173,35 @@ const ModelCard: React.FC<ModelCardProps> = ({
                                     max="2"
                                     value={editingHyperparameters?.temperature || 0}
                                     onChange={(e) => handleHyperparameterChange('temperature', parseFloat(e.target.value) || 0)}
-                                    className="w-full px-2 py-1 border rounded text-sm"
+                                    className="bg-transparent border-0 border-b border-gray-300 focus:border-blue-500 focus:ring-0 text-right text-gray-900 w-16 px-1"
                                 />
                             ) : (
-                                <div className="text-gray-900">{modelInfo.hyperparameters.temperature}</div>
+                                <div className="text-gray-900 w-16 text-right">{modelInfo.hyperparameters.temperature}</div>
                             )}
                         </div>
 
+                        {/* Context Length */}
+                        {(modelInfo.hyperparameters.contextLength !== undefined || isEditing) && (
+                            <div className="flex items-center">
+                                <label className="text-gray-700 font-medium flex-1 text-left">Context Length:</label>
+                                {isEditing ? (
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={editingHyperparameters?.contextLength || ''}
+                                        onChange={(e) => handleHyperparameterChange('contextLength', e.target.value ? parseInt(e.target.value) : undefined)}
+                                        className="bg-transparent border-0 border-b border-gray-300 focus:border-blue-500 focus:ring-0 text-right text-gray-900 w-16 px-1"
+                                    />
+                                ) : (
+                                    <div className="text-gray-900 w-16 text-right">{modelInfo.hyperparameters.contextLength || 'N/A'}</div>
+                                )}
+                            </div>
+                        )}
+
                         {/* Top P */}
                         {(modelInfo.hyperparameters.topP !== undefined || isEditing) && (
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">Top P</label>
+                            <div className="flex items-center">
+                                <label className="text-gray-700 font-medium flex-1 text-left">Top P:</label>
                                 {isEditing ? (
                                     <input
                                         type="number"
@@ -192,72 +210,56 @@ const ModelCard: React.FC<ModelCardProps> = ({
                                         max="1"
                                         value={editingHyperparameters?.topP || ''}
                                         onChange={(e) => handleHyperparameterChange('topP', e.target.value ? parseFloat(e.target.value) : undefined)}
-                                        className="w-full px-2 py-1 border rounded text-sm"
+                                        className="bg-transparent border-0 border-b border-gray-300 focus:border-blue-200 text-right text-gray-900 w-16 px-1"
                                     />
                                 ) : (
-                                    <div className="text-gray-900">{modelInfo.hyperparameters.topP || 'N/A'}</div>
+                                    <div className="text-gray-900 w-16 text-right">{modelInfo.hyperparameters.topP || 'N/A'}</div>
                                 )}
                             </div>
                         )}
 
                         {/* Top K */}
                         {(modelInfo.hyperparameters.topK !== undefined || isEditing) && (
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">Top K</label>
+                            <div className="flex items-center">
+                                <label className="text-gray-700 font-medium flex-1 text-left">Top K:</label>
                                 {isEditing ? (
                                     <input
                                         type="number"
                                         min="1"
                                         value={editingHyperparameters?.topK || ''}
                                         onChange={(e) => handleHyperparameterChange('topK', e.target.value ? parseInt(e.target.value) : undefined)}
-                                        className="w-full px-2 py-1 border rounded text-sm"
+                                        className="bg-transparent border-0 border-b border-gray-300 focus:border-blue-500 focus:ring-0 text-right text-gray-900 w-16 px-1"
                                     />
                                 ) : (
-                                    <div className="text-gray-900">{modelInfo.hyperparameters.topK || 'N/A'}</div>
+                                    <div className="text-gray-900 w-16 text-right">{modelInfo.hyperparameters.topK || 'N/A'}</div>
                                 )}
                             </div>
                         )}
 
                         {/* Max Tokens */}
                         {(modelInfo.hyperparameters.maxTokens !== undefined || isEditing) && (
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">Max Tokens</label>
+                            <div className="flex items-center">
+                                <label className="text-gray-700 font-medium flex-1 text-left">Max Tokens:</label>
                                 {isEditing ? (
                                     <input
                                         type="number"
                                         min="1"
                                         value={editingHyperparameters?.maxTokens || ''}
                                         onChange={(e) => handleHyperparameterChange('maxTokens', e.target.value ? parseInt(e.target.value) : undefined)}
-                                        className="w-full px-2 py-1 border rounded text-sm"
+                                        className="bg-transparent border-0 border-b border-gray-300 focus:border-blue-500 focus:ring-0 text-right text-gray-900 w-16 px-1"
                                     />
                                 ) : (
-                                    <div className="text-gray-900">{modelInfo.hyperparameters.maxTokens || 'N/A'}</div>
+                                    <div className="text-gray-900 w-16 text-right">{modelInfo.hyperparameters.maxTokens || 'N/A'}</div>
                                 )}
                             </div>
                         )}
 
-                        {/* Context Length */}
-                        {(modelInfo.hyperparameters.contextLength !== undefined || isEditing) && (
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">Context Length</label>
-                                {isEditing ? (
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        value={editingHyperparameters?.contextLength || ''}
-                                        onChange={(e) => handleHyperparameterChange('contextLength', e.target.value ? parseInt(e.target.value) : undefined)}
-                                        className="w-full px-2 py-1 border rounded text-sm"
-                                    />
-                                ) : (
-                                    <div className="text-gray-900">{modelInfo.hyperparameters.contextLength || 'N/A'}</div>
-                                )}
-                            </div>
-                        )}
+                        
 
                         {/* Repeat Penalty */}
                         {(modelInfo.hyperparameters.repeatPenalty !== undefined || isEditing) && (
-                            <div>
-                                <label className="block text-gray-700 font-medium mb-1">Repeat Penalty</label>
+                            <div className="flex items-center">
+                                <label className="text-gray-700 font-medium flex-1 text-left">Repeat Penalty:</label>
                                 {isEditing ? (
                                     <input
                                         type="number"
@@ -265,10 +267,64 @@ const ModelCard: React.FC<ModelCardProps> = ({
                                         min="0"
                                         value={editingHyperparameters?.repeatPenalty || ''}
                                         onChange={(e) => handleHyperparameterChange('repeatPenalty', e.target.value ? parseFloat(e.target.value) : undefined)}
-                                        className="w-full px-2 py-1 border rounded text-sm"
+                                        className="bg-transparent border-0 border-b border-gray-300 focus:border-blue-500 focus:ring-0 text-right text-gray-900 w-16 px-1"
                                     />
                                 ) : (
-                                    <div className="text-gray-900">{modelInfo.hyperparameters.repeatPenalty || 'N/A'}</div>
+                                    <div className="text-gray-900 w-16 text-right">{modelInfo.hyperparameters.repeatPenalty || 'N/A'}</div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Repeat Last N */}
+                        {(modelInfo.hyperparameters.repeatLastN !== undefined || isEditing) && (
+                            <div className="flex items-center">
+                                <label className="text-gray-700 font-medium flex-1 text-left">Repeat Last N:</label>
+                                {isEditing ? (
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={editingHyperparameters?.repeatLastN || ''}
+                                        onChange={(e) => handleHyperparameterChange('repeatLastN', e.target.value ? parseInt(e.target.value) : undefined)}
+                                        className="bg-transparent border-0 border-b border-gray-300 focus:border-blue-500 focus:ring-0 text-right text-gray-900 w-16 px-1"
+                                    />
+                                ) : (
+                                    <div className="text-gray-900 w-16 text-right">{modelInfo.hyperparameters.repeatLastN || 'N/A'}</div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Seed */}
+                        {(modelInfo.hyperparameters.seed !== undefined || isEditing) && (
+                            <div className="flex items-center">
+                                <label className="text-gray-700 font-medium flex-1 text-left">Seed:</label>
+                                {isEditing ? (
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={editingHyperparameters?.seed || ''}
+                                        onChange={(e) => handleHyperparameterChange('seed', e.target.value ? parseInt(e.target.value) : undefined)}
+                                        className="bg-transparent border-0 border-b border-gray-300 focus:border-blue-500 focus:ring-0 text-right text-gray-900 w-16 px-1"
+                                    />
+                                ) : (
+                                    <div className="text-gray-900 w-16 text-right">{modelInfo.hyperparameters.seed || 'N/A'}</div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* GPU Count */}
+                        {(modelInfo.hyperparameters.gpuCount !== undefined || isEditing) && (
+                            <div className="flex items-center">
+                                <label className="text-gray-700 font-medium flex-1 text-left">GPU Count:</label>
+                                {isEditing ? (
+                                    <input
+                                        type="number"
+                                        min="-1"
+                                        value={editingHyperparameters?.gpuCount || ''}
+                                        onChange={(e) => handleHyperparameterChange('gpuCount', e.target.value ? parseInt(e.target.value) : undefined)}
+                                        className="bg-transparent border-0 border-b border-gray-300 focus:border-blue-500 focus:ring-0 text-right text-gray-900 w-16 px-1"
+                                    />
+                                ) : (
+                                    <div className="text-gray-900 w-16 text-right">{modelInfo.hyperparameters.gpuCount || 'N/A'}</div>
                                 )}
                             </div>
                         )}

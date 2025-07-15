@@ -118,7 +118,7 @@ const PromptEditor: React.FC<PromptEditorProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="bg-white rounded-lg shadow-sm border p-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           {isCreating ? "Create New Prompt" : "Edit Prompt"}
@@ -145,8 +145,8 @@ const PromptEditor: React.FC<PromptEditorProps> = ({
         </div>
       )}
 
-      <form className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <form className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -172,14 +172,48 @@ const PromptEditor: React.FC<PromptEditorProps> = ({
               type="text"
               value={formData.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="e.g., Argument Analysis Prompt"
+              placeholder="e.g., Argument Analysis"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <p className="text-xs text-gray-500 mt-1">
-              No special characters allowed.
+              Display name for the prompt in the UI.
             </p>
           </div>
-          {/* Version */}
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Description *
+          </label>
+          <textarea
+            value={formData.description}
+            onChange={(e) => handleInputChange("description", e.target.value)}
+            placeholder="Brief description of what this prompt does..."
+            rows={3}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+          />
+        </div>
+
+        {/* Template */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Prompt Template *
+          </label>
+          <textarea
+            value={formData.template}
+            onChange={(e) => handleInputChange("template", e.target.value)}
+            placeholder="Enter your prompt template with input variables and expected JSON output format..."
+            rows={8}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical font-mono text-sm"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Template should include input variables (e.g., {"{text}"}) and specify the expected JSON output format.
+          </p>
+        </div>
+
+        {/* Version */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Version
@@ -193,75 +227,12 @@ const PromptEditor: React.FC<PromptEditorProps> = ({
             />
           </div>
         </div>
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description *
-          </label>
-          <textarea
-            value={formData.description}
-            onChange={(e) => handleInputChange("description", e.target.value)}
-            placeholder="Describe what this prompt does and when to use it..."
-            rows={3}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Application Type dropdown */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Application Type
-            </label>
-            <select
-              value={formData.application}
-              onChange={(e) =>
-                handleInputChange("application", e.target.value)
-              }
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="argument_analysis">Argument Analysis</option>
-              {/* Add more options as needed */}
-            </select>
-          </div>
-          {/* Input Variables */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Input Variables
-            </label>
-            <textarea
-              value={formData.inputVariables.join(", ")}
-              onChange={(e) =>
-                handleInputChange("inputVariables", e.target.value.split(", "))
-              }
-              placeholder="e.g., {text}"
-              rows={1}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-        </div>
-        {/* Prompt */}
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Prompt Text *
-            </label>
-          </div>
-          <textarea
-            value={formData.template}
-            onChange={(e) => handleInputChange("template", e.target.value)}
-            placeholder="Enter your prompt template..."
-            rows={12}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
-          />
-        </div>
+
         {/* Preferred Models */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">
             Preferred Models
           </label>
-          <p className="text-sm text-gray-500 mb-3">
-            Select models that work best with this prompt (optional)
-          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {availableModels.map((model) => (
               <label
@@ -288,50 +259,50 @@ const PromptEditor: React.FC<PromptEditorProps> = ({
         </div>
         {/* Tags */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
             Tags
           </label>
-          <div className="flex space-x-2 mb-2">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {formData.tags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+              >
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(tag)}
+                  className="ml-2 text-blue-600 hover:text-blue-800"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+          <div className="flex space-x-2">
             <input
               type="text"
               value={currentTag}
               onChange={(e) => setCurrentTag(e.target.value)}
-              onKeyPress={(e) =>
-                e.key === "Enter" && (e.preventDefault(), handleAddTag())
-              }
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleAddTag();
+                }
+              }}
               placeholder="Add a tag..."
               className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <button
               type="button"
               onClick={handleAddTag}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
             >
               Add
             </button>
           </div>
-
-          {formData.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {formData.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800"
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveTag(tag)}
-                    className="ml-2 text-gray-500 hover:text-gray-700"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
         </div>
-        {/* Actions */}
+
         <div className="flex justify-end space-x-3 pt-6 border-t border-gray-400">
           <button
             type="button"
