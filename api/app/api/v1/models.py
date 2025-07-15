@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Path
 from typing import Dict, Any
 
 from app.services.ollama_manager import ollama_manager
-from app.models.llm_models import ModelsResponse, ModelInfo, ModelHyperparameters
+from app.models.llm_models import ModelsResponse, ModelInfo, ModelHyperparameters, ModelResetResponse
 
 llm_models_router = APIRouter()
 
@@ -72,7 +72,7 @@ async def update_model_configuration(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update model configuration: {str(e)}")
 
-@llm_models_router.delete("/models/{model_name}/reset", response_model=Dict[str, Any])
+@llm_models_router.delete("/models/{model_name}/reset", response_model=ModelResetResponse)
 async def reset_model_configuration(
     model_name: str = Path(..., description="Name of the model to reset configuration for")
 ):
@@ -86,12 +86,12 @@ async def reset_model_configuration(
             raise HTTPException(status_code=404, detail=f"Model '{model_name}' not found")
         
         success = ollama_manager.delete_model_configuration(model_name)
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to reset model configuration")
         
-        return {
-            "message": f"Model configuration reset to defaults for '{model_name}'",
-            "model_name": model_name,
-            "reset": success
-        }
+        model_info = await ollama_manager.get_model_info(model_name)
+        
+        return ModelResetResponse(success=success, model_info=model_info)
     except HTTPException:
         raise
     except Exception as e:

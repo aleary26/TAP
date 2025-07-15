@@ -28,3 +28,8 @@ export interface ModelInfo {
 export interface ModelsResponse {
   models: ModelInfo[];
 }
+
+export interface ModelResetResponse {
+  success: boolean;
+  model_info: ModelInfo;
+}

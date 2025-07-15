@@ -184,9 +184,9 @@ export const PlatformProvider: React.FC<PlatformProviderProps> = ({ children }) 
   // Reset model hyperparameters to defaults
   const resetModel = async (modelName: string): Promise<ModelInfo> => {
     try {
-      const resetModel = await apiService.resetModel(modelName);
-      dispatch({ type: 'UPDATE_MODEL', payload: resetModel });
-      return resetModel;
+      const response = await apiService.resetModel(modelName);
+      dispatch({ type: 'UPDATE_MODEL', payload: response.model_info });
+      return response.model_info;
     } catch (error) {
       console.error('Error resetting model:', error);
       throw error;

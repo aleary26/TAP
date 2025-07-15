@@ -5,7 +5,7 @@ import type {
   MessageResponse,
   ApplicationType,
 } from '@/types/analysis';
-import type { ModelsResponse, ModelInfo, ModelHyperparameters } from '@/types/models';
+import type { ModelsResponse, ModelInfo, ModelHyperparameters, ModelResetResponse } from '@/types/models';
 import type { PromptsResponse, Prompt } from '@/types/prompts';
 import type { ArgumentAnalysisResult, LogicalFrameworkStep, Argument } from '@/types/argument-analysis';
 
@@ -22,6 +22,7 @@ import type {
   ApiLogicalFrameworkStep,
   ApiArgument,
   ApiModelHyperparameters,
+  ApiModelResetResponse,
 } from '@/types/api';
 
 // Analysis Request Transformers
@@ -127,6 +128,13 @@ export function transformModelInfoFromApi(modelInfo: ApiModelInfo): ModelInfo {
 export function transformModelsResponseFromApi(response: ApiModelsResponse): ModelsResponse {
   return {
     models: response.models.map(transformModelInfoFromApi)
+  };
+}
+
+export function transformModelResetResponseFromApi(response: ApiModelResetResponse): ModelResetResponse {
+  return {
+    success: response.success,
+    model_info: transformModelInfoFromApi(response.model_info)
   };
 }
 

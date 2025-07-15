@@ -3,7 +3,7 @@ import type {
   AnalysisResponse,
   MessageResponse,
 } from "../types/analysis";
-import type { ModelsResponse, ModelInfo, ModelHyperparameters } from "../types/models";
+import type { ModelsResponse, ModelInfo, ModelHyperparameters, ModelResetResponse } from "../types/models";
 import type { PromptsResponse, Prompt } from "../types/prompts";
 import type {
   ApiAnalysisResponse,
@@ -12,6 +12,7 @@ import type {
   ApiPrompt,
   ApiMessageResponse,
   ApiModelInfo,
+  ApiModelResetResponse,
 } from "../types/api";
 import {
   transformAnalysisRequestToApi,
@@ -23,6 +24,7 @@ import {
   transformMessageResponseFromApi,
   transformModelInfoFromApi,
   transformModelHyperparametersToApi,
+  transformModelResetResponseFromApi,
 } from "../utils/api-transformers";
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -105,11 +107,11 @@ export const apiService = {
     return transformModelInfoFromApi(apiResponse);
   },
 
-  async resetModel(modelName: string): Promise<ModelInfo> {
-    const apiResponse = await makeRequest<ApiModelInfo>(`/models/${modelName}/reset`, {
-      method: "POST",
+  async resetModel(modelName: string): Promise<ModelResetResponse> {
+    const apiResponse = await makeRequest<ApiModelResetResponse>(`/models/${modelName}/reset`, {
+      method: "DELETE",
     });
-    return transformModelInfoFromApi(apiResponse);
+    return transformModelResetResponseFromApi(apiResponse);
   },
 
   // Prompt Management

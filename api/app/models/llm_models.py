@@ -32,3 +32,8 @@ class ModelInfo(BaseModel):
 class ModelsResponse(BaseModel):
     """Response containing available models."""
     models: List[ModelInfo] = Field(..., description="List of available models") 
+
+class ModelResetResponse(BaseModel):
+    """Response containing the result of a model reset."""
+    success: bool = Field(..., description="Whether the model reset was successful")
+    model_info: ModelInfo = Field(..., description="Model information after reset")

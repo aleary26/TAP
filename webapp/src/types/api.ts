@@ -107,4 +107,9 @@ export interface ApiPromptsResponse {
 
 export interface ApiMessageResponse {
     message: string;
-} 
+}
+
+export interface ApiModelResetResponse {
+    success: boolean;
+    model_info: ApiModelInfo;
+}
