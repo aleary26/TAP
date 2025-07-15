@@ -80,7 +80,7 @@ const ApplicationSelector: React.FC = () => {
                 </div>
             </div>
 
-            <div className="border rounded-lg p-4 bg-purple-50">
+            <div className="rounded-lg p-4 bg-purple-50 border border-purple-500">
                 <div className="flex items-center justify-start space-x-3">
                     <span className="text-3xl">{activeAppInfo.icon}</span>
                     <div className="flex-1">
