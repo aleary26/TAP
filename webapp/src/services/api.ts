@@ -3,7 +3,7 @@ import type {
   AnalysisResponse,
   MessageResponse,
 } from "../types/analysis";
-import type { ModelsResponse } from "../types/models";
+import type { ModelsResponse, ModelInfo, ModelHyperparameters } from "../types/models";
 import type { PromptsResponse, Prompt } from "../types/prompts";
 import type {
   ApiAnalysisResponse,
@@ -11,6 +11,7 @@ import type {
   ApiPromptsResponse,
   ApiPrompt,
   ApiMessageResponse,
+  ApiModelInfo,
 } from "../types/api";
 import {
   transformAnalysisRequestToApi,
@@ -20,6 +21,8 @@ import {
   transformPromptToApi,
   transformPromptFromApi,
   transformMessageResponseFromApi,
+  transformModelInfoFromApi,
+  transformModelHyperparametersToApi,
 } from "../utils/api-transformers";
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -91,6 +94,22 @@ export const apiService = {
   async getModels(): Promise<ModelsResponse> {
     const apiResponse = await makeRequest<ApiModelsResponse>("/models");
     return transformModelsResponseFromApi(apiResponse);
+  },
+
+  async updateModel(modelName: string, hyperparameters: ModelHyperparameters): Promise<ModelInfo> {
+    const apiHyperparameters = transformModelHyperparametersToApi(hyperparameters);
+    const apiResponse = await makeRequest<ApiModelInfo>(`/models/${modelName}`, {
+      method: "PUT",
+      body: JSON.stringify(apiHyperparameters),
+    });
+    return transformModelInfoFromApi(apiResponse);
+  },
+
+  async resetModel(modelName: string): Promise<ModelInfo> {
+    const apiResponse = await makeRequest<ApiModelInfo>(`/models/${modelName}/reset`, {
+      method: "POST",
+    });
+    return transformModelInfoFromApi(apiResponse);
   },
 
   // Prompt Management

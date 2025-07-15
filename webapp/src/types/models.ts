@@ -1,4 +1,4 @@
-export interface ModelHyperparemters {
+export interface ModelHyperparameters {
     temperature: number;
     topP?: number;
     topK?: number;
@@ -22,7 +22,7 @@ export interface ModelMetadata {
 
 export interface ModelInfo {
     metadata: ModelMetadata;
-    hyperparameters: ModelHyperparemters;
+    hyperparameters: ModelHyperparameters;
 }
 
 export interface ModelsResponse {

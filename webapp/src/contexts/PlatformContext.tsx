@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
-import type { ModelInfo } from '@/types/models';
+import type { ModelInfo, ModelHyperparameters } from '@/types/models';
 import type { Prompt } from '@/types/prompts';
 import type { ApplicationType } from '@/types/analysis';
 import { apiService } from '@/services/api';
@@ -27,7 +27,8 @@ type PlatformAction =
   | { type: 'SET_MODELS_LOADING'; payload: boolean }
   | { type: 'SET_PROMPTS_LOADING'; payload: boolean }
   | { type: 'SET_MODELS_ERROR'; payload: string | null }
-  | { type: 'SET_PROMPTS_ERROR'; payload: string | null };
+  | { type: 'SET_PROMPTS_ERROR'; payload: string | null }
+  | { type: 'UPDATE_MODEL'; payload: ModelInfo };
 
 // Initial state
 const initialState: PlatformState = {
@@ -66,6 +67,13 @@ function platformReducer(
       return { ...state, modelsError: action.payload };
     case 'SET_PROMPTS_ERROR':
       return { ...state, promptsError: action.payload };
+    case 'UPDATE_MODEL':
+      return {
+        ...state,
+        models: state.models.map(model =>
+          model.metadata.name === action.payload.metadata.name ? action.payload : model
+        )
+      };
     default:
       return state;
   }
@@ -80,6 +88,8 @@ interface PlatformContextType {
   loadModels: () => Promise<void>;
   loadPrompts: () => Promise<void>;
   refreshPrompts: () => Promise<void>;
+  updateModel: (modelName: string, hyperparameters: ModelHyperparameters) => Promise<ModelInfo>;
+  resetModel: (modelName: string) => Promise<ModelInfo>;
 }
 
 // Create context
@@ -159,6 +169,30 @@ export const PlatformProvider: React.FC<PlatformProviderProps> = ({ children }) 
   // Refresh prompts (alias for loadPrompts for component compatibility)
   const refreshPrompts = loadPrompts;
 
+  // Update model hyperparameters
+  const updateModel = async (modelName: string, hyperparameters: ModelHyperparameters): Promise<ModelInfo> => {
+    try {
+      const updatedModel = await apiService.updateModel(modelName, hyperparameters);
+      dispatch({ type: 'UPDATE_MODEL', payload: updatedModel });
+      return updatedModel;
+    } catch (error) {
+      console.error('Error updating model:', error);
+      throw error;
+    }
+  };
+
+  // Reset model hyperparameters to defaults
+  const resetModel = async (modelName: string): Promise<ModelInfo> => {
+    try {
+      const resetModel = await apiService.resetModel(modelName);
+      dispatch({ type: 'UPDATE_MODEL', payload: resetModel });
+      return resetModel;
+    } catch (error) {
+      console.error('Error resetting model:', error);
+      throw error;
+    }
+  };
+
   // Load initial data
   useEffect(() => {
     loadModels();
@@ -173,6 +207,8 @@ export const PlatformProvider: React.FC<PlatformProviderProps> = ({ children }) 
     loadModels,
     loadPrompts,
     refreshPrompts,
+    updateModel,
+    resetModel,
   };
 
   return (
@@ -193,7 +229,7 @@ export const usePlatformContext = (): PlatformContextType => {
 
 // Convenience hooks for specific parts of the state
 export const useModels = () => {
-  const { state, setActiveModel, loadModels } = usePlatformContext();
+  const { state, setActiveModel, loadModels, updateModel, resetModel } = usePlatformContext();
   return {
     models: state.models,
     activeModelName: state.activeModelName,
@@ -201,6 +237,8 @@ export const useModels = () => {
     modelsError: state.modelsError,
     setActiveModel,
     loadModels,
+    updateModel,
+    resetModel,
   };
 };
 

@@ -5,7 +5,7 @@ import type {
   MessageResponse,
   ApplicationType,
 } from '@/types/analysis';
-import type { ModelsResponse, ModelInfo } from '@/types/models';
+import type { ModelsResponse, ModelInfo, ModelHyperparameters } from '@/types/models';
 import type { PromptsResponse, Prompt } from '@/types/prompts';
 import type { ArgumentAnalysisResult, LogicalFrameworkStep, Argument } from '@/types/argument-analysis';
 
@@ -21,6 +21,7 @@ import type {
   ApiArgumentAnalysisResult,
   ApiLogicalFrameworkStep,
   ApiArgument,
+  ApiModelHyperparameters,
 } from '@/types/api';
 
 // Analysis Request Transformers
@@ -166,5 +167,19 @@ export function transformPromptsResponseFromApi(response: ApiPromptsResponse): P
 export function transformMessageResponseFromApi(response: ApiMessageResponse): MessageResponse {
   return {
     message: response.message
+  };
+}
+
+export function transformModelHyperparametersToApi(hyperparameters: ModelHyperparameters): ApiModelHyperparameters {
+  return {
+    temperature: hyperparameters.temperature,
+    top_p: hyperparameters.topP,
+    top_k: hyperparameters.topK,
+    max_tokens: hyperparameters.maxTokens,
+    repeat_last_n: hyperparameters.repeatLastN,
+    repeat_penalty: hyperparameters.repeatPenalty,
+    context_length: hyperparameters.contextLength,
+    seed: hyperparameters.seed,
+    gpu_count: hyperparameters.gpuCount
   };
 } 

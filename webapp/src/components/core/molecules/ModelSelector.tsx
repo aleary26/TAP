@@ -64,6 +64,7 @@ const ModelSelector: React.FC = () => {
       {activeModelInfo ? (
         <ModelCard
           model={activeModelInfo.metadata}
+          modelInfo={activeModelInfo}
           isActive={true}
           onActivate={handleModelSwitch}
         />
