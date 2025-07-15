@@ -114,8 +114,10 @@ export function transformModelInfoFromApi(modelInfo: ApiModelInfo): ModelInfo {
       topP: modelInfo.hyperparameters.top_p,
       topK: modelInfo.hyperparameters.top_k,
       maxTokens: modelInfo.hyperparameters.max_tokens,
+      repeatLastN: modelInfo.hyperparameters.repeat_last_n,
       repeatPenalty: modelInfo.hyperparameters.repeat_penalty,
       contextLength: modelInfo.hyperparameters.context_length,
+      seed: modelInfo.hyperparameters.seed,
       gpuCount: modelInfo.hyperparameters.gpu_count
     }
   };

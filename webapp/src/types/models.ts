@@ -3,8 +3,10 @@ export interface ModelHyperparemters {
     topP?: number;
     topK?: number;
     maxTokens?: number;
+    repeatLastN?: number;
     repeatPenalty?: number;
     contextLength?: number;
+    seed?: number;
     gpuCount?: number;
 }
 

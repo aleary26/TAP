@@ -82,6 +82,8 @@ class OllamaManager:
             config.ollama_model_name = model_name
             self._save_model_configuration_to_file(model_name, config)
             self.model_configurations[config.ollama_model_name] = config
+            if (config.ollama_model_name in self.available_models):
+                self.available_models[config.ollama_model_name].hyperparameters = config
             if config.ollama_model_name in self.llm_instances:
                 del self.llm_instances[config.ollama_model_name]
             return True
@@ -105,6 +107,9 @@ class OllamaManager:
         if model_name in self.model_configurations:
             del self.model_configurations[model_name]
             success = True
+
+        if model_name in self.available_models:
+            del self.available_models[model_name]
         
         if model_name in self.llm_instances:
             del self.llm_instances[model_name]
@@ -113,9 +118,15 @@ class OllamaManager:
 
     async def is_model_available(self, model_name: str) -> bool:
         """Check if a specific model is available. If there are no cached models, fetch the list."""
-        if not self.available_models:
-            await self.get_available_models() # TODO: instead of doing this as a side effect, make this a direct call earlier
+        if not self.available_models or model_name not in self.available_models:
+            await self.get_available_models() 
         return model_name in self.available_models
+    
+    async def get_model_info(self, model_name: str) -> ModelInfo:
+        """Get model info for a specific model."""
+        if model_name not in self.available_models:
+            await self.get_available_models() 
+        return self.available_models[model_name]
     
     async def get_available_models(self) -> List[ModelInfo]:
         """ Get list of available models from Ollama and cache with available metadata."""

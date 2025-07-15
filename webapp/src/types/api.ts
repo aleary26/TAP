@@ -63,8 +63,10 @@ export interface ApiModelHyperparameters {
     top_p?: number;
     top_k?: number;
     max_tokens?: number;
+    repeat_last_n?: number;
     repeat_penalty?: number;
     context_length?: number;
+    seed?: number;
     gpu_count?: number;
 }
 

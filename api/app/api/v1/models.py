@@ -33,12 +33,7 @@ async def get_model_configuration(
         if not await ollama_manager.is_model_available(model_name):
             raise HTTPException(status_code=404, detail=f"Model '{model_name}' not found")
         
-        available_models = await ollama_manager.get_available_models()
-        model_info = None
-        for model in available_models:
-            if model.metadata.name == model_name:
-                model_info = model
-                break
+        model_info = await ollama_manager.get_model_info(model_name)
         
         if not model_info:
             raise HTTPException(status_code=404, detail=f"Model '{model_name}' not found")
@@ -49,7 +44,7 @@ async def get_model_configuration(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get model configuration: {str(e)}")
 
-@llm_models_router.put("/models/{model_name}", response_model=Dict[str, Any])
+@llm_models_router.put("/models/{model_name}", response_model=ModelInfo)
 async def update_model_configuration(
     hyperparameters: ModelHyperparameters,
     model_name: str = Path(..., description="Name of the model to update configuration for")
@@ -69,11 +64,9 @@ async def update_model_configuration(
         if not success:
             raise HTTPException(status_code=500, detail="Failed to save model configuration")
         
-        return {
-            "message": f"Model configuration updated successfully for '{model_name}'",
-            "model_name": model_name,
-            "hyperparameters": hyperparameters.model_dump()
-        }
+        model_info = await ollama_manager.get_model_info(model_name)        
+        
+        return model_info
     except HTTPException:
         raise
     except Exception as e:
