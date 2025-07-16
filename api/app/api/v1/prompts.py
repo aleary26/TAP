@@ -1,11 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Path
 
 from app.services.prompt_manager import prompt_manager
 from app.models.prompts import PromptsResponse, Prompt
 
 prompts_router = APIRouter()
 
-# GET /prompts
 @prompts_router.get("/prompts", response_model=PromptsResponse)
 async def get_prompts():
     """Get a list of all available prompts."""
@@ -16,7 +15,6 @@ async def get_prompts():
         print(f"Error fetching prompts: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get prompts: {str(e)}")
 
-# POST /prompts
 @prompts_router.post("/prompts", response_model=Prompt)
 async def create_prompt(prompt: Prompt):
     """Create a new prompt."""
@@ -31,7 +29,10 @@ async def create_prompt(prompt: Prompt):
         raise HTTPException(status_code=500, detail=f"Failed to create prompt: {str(e)}")
 
 @prompts_router.put("/prompts/{prompt_name}", response_model=Prompt)
-async def update_prompt(prompt_name: str, prompt: Prompt):
+async def update_prompt(
+    prompt: Prompt,
+    prompt_name: str = Path(..., description="Name of the prompt to update")
+):
     """Update an existing prompt."""
     try:
         success = prompt_manager.update_prompt(prompt_name, prompt)
@@ -44,7 +45,9 @@ async def update_prompt(prompt_name: str, prompt: Prompt):
         raise HTTPException(status_code=500, detail=f"Failed to update prompt: {str(e)}")
 
 @prompts_router.delete("/prompts/{prompt_name}", response_model=bool)
-async def delete_prompt(prompt_name: str):
+async def delete_prompt(
+    prompt_name: str = Path(..., description="Name of the prompt to delete")
+):
     """Delete a prompt by name."""
     try:
         success = prompt_manager.delete_prompt(prompt_name)

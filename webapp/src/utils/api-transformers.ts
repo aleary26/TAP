@@ -5,7 +5,7 @@ import type {
   MessageResponse,
   ApplicationType,
 } from '@/types/analysis';
-import type { ModelsResponse, ModelInfo } from '@/types/models';
+import type { ModelsResponse, ModelInfo, ModelGenerationParams, ModelResetResponse } from '@/types/models';
 import type { PromptsResponse, Prompt } from '@/types/prompts';
 import type { ArgumentAnalysisResult, LogicalFrameworkStep, Argument } from '@/types/argument-analysis';
 
@@ -21,6 +21,8 @@ import type {
   ApiArgumentAnalysisResult,
   ApiLogicalFrameworkStep,
   ApiArgument,
+  ApiModelGenerationParams,
+  ApiModelResetResponse,
 } from '@/types/api';
 
 // Analysis Request Transformers
@@ -109,14 +111,16 @@ export function transformModelInfoFromApi(modelInfo: ApiModelInfo): ModelInfo {
       architecture: modelInfo.metadata.architecture,
       quantization: modelInfo.metadata.quantization
     },
-    hyperparameters: {
-      temperature: modelInfo.hyperparameters.temperature,
-      topP: modelInfo.hyperparameters.top_p,
-      topK: modelInfo.hyperparameters.top_k,
-      maxTokens: modelInfo.hyperparameters.max_tokens,
-      repeatPenalty: modelInfo.hyperparameters.repeat_penalty,
-      contextLength: modelInfo.hyperparameters.context_length,
-      gpuCount: modelInfo.hyperparameters.gpu_count
+    generationParams: {
+      temperature: modelInfo.generation_params.temperature,
+      topP: modelInfo.generation_params.top_p,
+      topK: modelInfo.generation_params.top_k,
+      maxTokens: modelInfo.generation_params.max_tokens,
+      repeatLastN: modelInfo.generation_params.repeat_last_n,
+      repeatPenalty: modelInfo.generation_params.repeat_penalty,
+      contextLength: modelInfo.generation_params.context_length,
+      seed: modelInfo.generation_params.seed,
+      gpuCount: modelInfo.generation_params.gpu_count
     }
   };
 }
@@ -124,6 +128,13 @@ export function transformModelInfoFromApi(modelInfo: ApiModelInfo): ModelInfo {
 export function transformModelsResponseFromApi(response: ApiModelsResponse): ModelsResponse {
   return {
     models: response.models.map(transformModelInfoFromApi)
+  };
+}
+
+export function transformModelResetResponseFromApi(response: ApiModelResetResponse): ModelResetResponse {
+  return {
+    success: response.success,
+    model_info: transformModelInfoFromApi(response.model_info)
   };
 }
 
@@ -165,4 +176,20 @@ export function transformMessageResponseFromApi(response: ApiMessageResponse): M
   return {
     message: response.message
   };
-} 
+}
+
+export function transformModelGenerationParamsToApi(generationParams: ModelGenerationParams): ApiModelGenerationParams {
+  return {
+    temperature: generationParams.temperature,
+    top_p: generationParams.topP,
+    top_k: generationParams.topK,
+    max_tokens: generationParams.maxTokens,
+    repeat_last_n: generationParams.repeatLastN,
+    repeat_penalty: generationParams.repeatPenalty,
+    context_length: generationParams.contextLength,
+    seed: generationParams.seed,
+    gpu_count: generationParams.gpuCount
+  };
+}
+
+ 

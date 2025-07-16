@@ -158,7 +158,7 @@ The system will extract arguments, analyze their logical structure, identify sup
 ## 🔮 Planned Enhancements
 
 - **Experiment Framework**: A/B testing for model and prompt comparison
-- **Enhanced Configuration**: Fine-tuned hyperparameter controls
+- **Enhanced Configuration**: Fine-tuned generation parameter controls
 - **Results Persistence**: Save and compare analysis results over time
 - **Additional Applications**: AI content detection, text quality assessment, etc.
 - **Import Capabilities**: Support for file uploads and URL text extraction

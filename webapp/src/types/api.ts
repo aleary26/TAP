@@ -58,13 +58,15 @@ export interface ApiAnalysisResponse {
     statistics: ApiAnalysisStatistics;
 }
 
-export interface ApiModelHyperparameters {
+export interface ApiModelGenerationParams {
     temperature: number;
     top_p?: number;
     top_k?: number;
     max_tokens?: number;
+    repeat_last_n?: number;
     repeat_penalty?: number;
     context_length?: number;
+    seed?: number;
     gpu_count?: number;
 }
 
@@ -80,7 +82,7 @@ export interface ApiModelMetadata {
 
 export interface ApiModelInfo {
     metadata: ApiModelMetadata;
-    hyperparameters: ApiModelHyperparameters;
+    generation_params: ApiModelGenerationParams;
 }
 
 export interface ApiModelsResponse {
@@ -105,4 +107,9 @@ export interface ApiPromptsResponse {
 
 export interface ApiMessageResponse {
     message: string;
-} 
+}
+
+export interface ApiModelResetResponse {
+    success: boolean;
+    model_info: ApiModelInfo;
+}

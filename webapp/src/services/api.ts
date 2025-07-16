@@ -3,7 +3,7 @@ import type {
   AnalysisResponse,
   MessageResponse,
 } from "../types/analysis";
-import type { ModelsResponse } from "../types/models";
+import type { ModelsResponse, ModelInfo, ModelGenerationParams, ModelResetResponse } from "../types/models";
 import type { PromptsResponse, Prompt } from "../types/prompts";
 import type {
   ApiAnalysisResponse,
@@ -11,6 +11,8 @@ import type {
   ApiPromptsResponse,
   ApiPrompt,
   ApiMessageResponse,
+  ApiModelInfo,
+  ApiModelResetResponse,
 } from "../types/api";
 import {
   transformAnalysisRequestToApi,
@@ -20,6 +22,9 @@ import {
   transformPromptToApi,
   transformPromptFromApi,
   transformMessageResponseFromApi,
+  transformModelInfoFromApi,
+  transformModelGenerationParamsToApi,
+  transformModelResetResponseFromApi,
 } from "../utils/api-transformers";
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -91,6 +96,22 @@ export const apiService = {
   async getModels(): Promise<ModelsResponse> {
     const apiResponse = await makeRequest<ApiModelsResponse>("/models");
     return transformModelsResponseFromApi(apiResponse);
+  },
+
+  async updateModel(modelName: string, generationParams: ModelGenerationParams): Promise<ModelInfo> {
+    const apiGenerationParams = transformModelGenerationParamsToApi(generationParams);
+    const apiResponse = await makeRequest<ApiModelInfo>(`/models/${modelName}`, {
+      method: "PUT",
+      body: JSON.stringify(apiGenerationParams),
+    });
+    return transformModelInfoFromApi(apiResponse);
+  },
+
+  async resetModel(modelName: string): Promise<ModelResetResponse> {
+    const apiResponse = await makeRequest<ApiModelResetResponse>(`/models/${modelName}/reset`, {
+      method: "DELETE",
+    });
+    return transformModelResetResponseFromApi(apiResponse);
   },
 
   // Prompt Management

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
-import type { ModelInfo } from '@/types/models';
+import type { ModelInfo, ModelGenerationParams } from '@/types/models';
 import type { Prompt } from '@/types/prompts';
 import type { ApplicationType } from '@/types/analysis';
 import { apiService } from '@/services/api';
@@ -15,6 +15,9 @@ interface PlatformState {
   promptsLoading: boolean;
   modelsError: string | null;
   promptsError: string | null;
+  isEditingPrompt: boolean;
+  editingPrompt: Prompt | null;
+  isCreatingPrompt: boolean;
 }
 
 // Action types
@@ -27,7 +30,10 @@ type PlatformAction =
   | { type: 'SET_MODELS_LOADING'; payload: boolean }
   | { type: 'SET_PROMPTS_LOADING'; payload: boolean }
   | { type: 'SET_MODELS_ERROR'; payload: string | null }
-  | { type: 'SET_PROMPTS_ERROR'; payload: string | null };
+  | { type: 'SET_PROMPTS_ERROR'; payload: string | null }
+  | { type: 'UPDATE_MODEL'; payload: ModelInfo }
+  | { type: 'START_EDITING_PROMPT'; payload: { prompt: Prompt | null; isCreating: boolean } }
+  | { type: 'STOP_EDITING_PROMPT' };
 
 // Initial state
 const initialState: PlatformState = {
@@ -40,6 +46,9 @@ const initialState: PlatformState = {
   promptsLoading: false,
   modelsError: null,
   promptsError: null,
+  isEditingPrompt: false,
+  editingPrompt: null,
+  isCreatingPrompt: false,
 };
 
 // Reducer
@@ -66,6 +75,27 @@ function platformReducer(
       return { ...state, modelsError: action.payload };
     case 'SET_PROMPTS_ERROR':
       return { ...state, promptsError: action.payload };
+    case 'UPDATE_MODEL':
+      return {
+        ...state,
+        models: state.models.map(model =>
+          model.metadata.name === action.payload.metadata.name ? action.payload : model
+        )
+      };
+    case 'START_EDITING_PROMPT':
+      return {
+        ...state,
+        isEditingPrompt: true,
+        editingPrompt: action.payload.prompt,
+        isCreatingPrompt: action.payload.isCreating
+      };
+    case 'STOP_EDITING_PROMPT':
+      return {
+        ...state,
+        isEditingPrompt: false,
+        editingPrompt: null,
+        isCreatingPrompt: false
+      };
     default:
       return state;
   }
@@ -80,6 +110,11 @@ interface PlatformContextType {
   loadModels: () => Promise<void>;
   loadPrompts: () => Promise<void>;
   refreshPrompts: () => Promise<void>;
+  updateModel: (modelName: string, generationParams: ModelGenerationParams) => Promise<ModelInfo>;
+  resetModel: (modelName: string) => Promise<ModelInfo>;
+  startEditingPrompt: (prompt: Prompt | null, isCreating: boolean) => void;
+  stopEditingPrompt: () => void;
+  savePrompt: (prompt: Prompt) => Promise<void>;
 }
 
 // Create context
@@ -159,6 +194,56 @@ export const PlatformProvider: React.FC<PlatformProviderProps> = ({ children }) 
   // Refresh prompts (alias for loadPrompts for component compatibility)
   const refreshPrompts = loadPrompts;
 
+  // Update model generation parameters
+  const updateModel = async (modelName: string, generationParams: ModelGenerationParams): Promise<ModelInfo> => {
+    try {
+      const updatedModel = await apiService.updateModel(modelName, generationParams);
+      dispatch({ type: 'UPDATE_MODEL', payload: updatedModel });
+      return updatedModel;
+    } catch (error) {
+      console.error('Error updating model:', error);
+      throw error;
+    }
+  };
+
+  // Reset model generation params to defaults
+  const resetModel = async (modelName: string): Promise<ModelInfo> => {
+    try {
+      const response = await apiService.resetModel(modelName);
+      dispatch({ type: 'UPDATE_MODEL', payload: response.model_info });
+      return response.model_info;
+    } catch (error) {
+      console.error('Error resetting model:', error);
+      throw error;
+    }
+  };
+
+  // Start editing a prompt
+  const startEditingPrompt = (prompt: Prompt | null, isCreating: boolean) => {
+    dispatch({ type: 'START_EDITING_PROMPT', payload: { prompt, isCreating } });
+  };
+
+  // Stop editing a prompt
+  const stopEditingPrompt = () => {
+    dispatch({ type: 'STOP_EDITING_PROMPT' });
+  };
+
+  // Save a prompt (create or update)
+  const savePrompt = async (prompt: Prompt): Promise<void> => {
+    try {
+      if (state.isCreatingPrompt) {
+        await apiService.createPrompt(prompt);
+      } else {
+        await apiService.updatePrompt(prompt);
+      }
+      await loadPrompts(); // Refresh the prompts list
+      stopEditingPrompt(); // Exit editing mode
+    } catch (error) {
+      console.error('Error saving prompt:', error);
+      throw error;
+    }
+  };
+
   // Load initial data
   useEffect(() => {
     loadModels();
@@ -173,6 +258,11 @@ export const PlatformProvider: React.FC<PlatformProviderProps> = ({ children }) 
     loadModels,
     loadPrompts,
     refreshPrompts,
+    updateModel,
+    resetModel,
+    startEditingPrompt,
+    stopEditingPrompt,
+    savePrompt,
   };
 
   return (
@@ -193,7 +283,7 @@ export const usePlatformContext = (): PlatformContextType => {
 
 // Convenience hooks for specific parts of the state
 export const useModels = () => {
-  const { state, setActiveModel, loadModels } = usePlatformContext();
+  const { state, setActiveModel, loadModels, updateModel, resetModel } = usePlatformContext();
   return {
     models: state.models,
     activeModelName: state.activeModelName,
@@ -201,6 +291,8 @@ export const useModels = () => {
     modelsError: state.modelsError,
     setActiveModel,
     loadModels,
+    updateModel,
+    resetModel,
   };
 };
 

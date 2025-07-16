@@ -1,10 +1,12 @@
-export interface ModelHyperparemters {
+export interface ModelGenerationParams {
     temperature: number;
     topP?: number;
     topK?: number;
     maxTokens?: number;
+    repeatLastN?: number;
     repeatPenalty?: number;
     contextLength?: number;
+    seed?: number;
     gpuCount?: number;
 }
 
@@ -20,9 +22,15 @@ export interface ModelMetadata {
 
 export interface ModelInfo {
     metadata: ModelMetadata;
-    hyperparameters: ModelHyperparemters;
+    generationParams: ModelGenerationParams;
 }
 
 export interface ModelsResponse {
   models: ModelInfo[];
 }
+
+export interface ModelResetResponse {
+  success: boolean;
+  model_info: ModelInfo;
+}
+

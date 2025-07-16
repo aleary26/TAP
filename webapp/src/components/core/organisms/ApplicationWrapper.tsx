@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import type { AnalysisResponse } from '@/types/analysis';
-import { useApplications } from '@/contexts/PlatformContext';
+import { useApplications, useModels, usePlatformContext } from '@/contexts/PlatformContext';
 import LGTextInputCard from '@/components/core/organisms/LGTextInputCard';
 import ReadyDisplayCard from '@/components/apps/argument_analysis/molecules/ReadyDisplayCard';
 import TabbedArgumentAnalysisResults from '@/components/apps/argument_analysis/organisms/TabbedArgumentAnalysisResults';
+import PromptEditor from '@/components/core/organisms/PromptEditor';
 
-interface ApplicationWrapperComponentProps {
+interface ApplicationWrapperProps {
   onError: (error: string) => void;
 }
 
-const ApplicationWrapperComponent: React.FC<ApplicationWrapperComponentProps> = ({ onError }) => {
+const ApplicationWrapper: React.FC<ApplicationWrapperProps> = ({ onError }) => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { activeApplicationType } = useApplications();
+  const { models } = useModels();
+  const { state, stopEditingPrompt, savePrompt } = usePlatformContext();
 
   const handleAnalysisStart = () => {
     setIsAnalyzing(true);
@@ -54,6 +57,20 @@ const ApplicationWrapperComponent: React.FC<ApplicationWrapperComponentProps> = 
 
   const appConfig = getApplicationConfig();
 
+  if (state.isEditingPrompt) {
+    return (
+      <div className="lg:col-span-2">
+        <PromptEditor
+          prompt={state.editingPrompt}
+          isCreating={state.isCreatingPrompt}
+          availableModels={models}
+          onSave={savePrompt}
+          onCancel={stopEditingPrompt}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="lg:col-span-2 space-y-6">
       <LGTextInputCard
@@ -74,4 +91,4 @@ const ApplicationWrapperComponent: React.FC<ApplicationWrapperComponentProps> = 
   );
 };
 
-export default ApplicationWrapperComponent; 
+export default ApplicationWrapper; 
