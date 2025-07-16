@@ -28,8 +28,6 @@ const PromptSelector: React.FC = () => {
     startEditingPrompt(prompt, prompt === null);
   };
 
-  // Don't render prompt editor here anymore - it will be handled by the main app layout
-
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-3">

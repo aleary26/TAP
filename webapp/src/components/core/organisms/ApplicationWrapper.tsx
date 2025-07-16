@@ -57,7 +57,6 @@ const ApplicationWrapper: React.FC<ApplicationWrapperProps> = ({ onError }) => {
 
   const appConfig = getApplicationConfig();
 
-  // If prompt editing is active, show the prompt editor instead of normal content
   if (state.isEditingPrompt) {
     return (
       <div className="lg:col-span-2">
