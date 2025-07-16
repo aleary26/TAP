@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
-import type { ModelInfo, ModelHyperparameters } from '@/types/models';
+import type { ModelInfo, ModelGenerationParams } from '@/types/models';
 import type { Prompt } from '@/types/prompts';
 import type { ApplicationType } from '@/types/analysis';
 import { apiService } from '@/services/api';
@@ -110,7 +110,7 @@ interface PlatformContextType {
   loadModels: () => Promise<void>;
   loadPrompts: () => Promise<void>;
   refreshPrompts: () => Promise<void>;
-  updateModel: (modelName: string, hyperparameters: ModelHyperparameters) => Promise<ModelInfo>;
+  updateModel: (modelName: string, generationParams: ModelGenerationParams) => Promise<ModelInfo>;
   resetModel: (modelName: string) => Promise<ModelInfo>;
   startEditingPrompt: (prompt: Prompt | null, isCreating: boolean) => void;
   stopEditingPrompt: () => void;
@@ -194,10 +194,10 @@ export const PlatformProvider: React.FC<PlatformProviderProps> = ({ children }) 
   // Refresh prompts (alias for loadPrompts for component compatibility)
   const refreshPrompts = loadPrompts;
 
-  // Update model hyperparameters
-  const updateModel = async (modelName: string, hyperparameters: ModelHyperparameters): Promise<ModelInfo> => {
+  // Update model generation parameters
+  const updateModel = async (modelName: string, generationParams: ModelGenerationParams): Promise<ModelInfo> => {
     try {
-      const updatedModel = await apiService.updateModel(modelName, hyperparameters);
+      const updatedModel = await apiService.updateModel(modelName, generationParams);
       dispatch({ type: 'UPDATE_MODEL', payload: updatedModel });
       return updatedModel;
     } catch (error) {
@@ -206,7 +206,7 @@ export const PlatformProvider: React.FC<PlatformProviderProps> = ({ children }) 
     }
   };
 
-  // Reset model hyperparameters to defaults
+  // Reset model generation params to defaults
   const resetModel = async (modelName: string): Promise<ModelInfo> => {
     try {
       const response = await apiService.resetModel(modelName);

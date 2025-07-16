@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface HyperparameterInputProps {
+interface GenerationParamInputProps {
     type: 'number';
     value: number | string;
     onChange: (value: number | undefined) => void;
@@ -10,7 +10,7 @@ interface HyperparameterInputProps {
     className?: string;
 }
 
-const HyperparameterInput: React.FC<HyperparameterInputProps> = ({
+const GenerationParamInput: React.FC<GenerationParamInputProps> = ({
     type,
     value,
     onChange,
@@ -62,4 +62,4 @@ const HyperparameterInput: React.FC<HyperparameterInputProps> = ({
     );
 };
 
-export default HyperparameterInput; 
+export default GenerationParamInput; 

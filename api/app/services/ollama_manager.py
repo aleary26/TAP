@@ -6,7 +6,7 @@ from langchain_ollama import OllamaLLM #, ChatOllama, OllamaEmbeddings
 
 
 from app.core.config import settings
-from app.models.llm_models import ModelHyperparameters, ModelMetadata, ModelInfo
+from app.models.llm_models import ModelGenerationParams, ModelMetadata, ModelInfo
 
 class OllamaManager:
     """Manager for interacting with Ollama models and provides LangChain integration"""
@@ -14,7 +14,7 @@ class OllamaManager:
         self.client = ollama.Client(host=settings.ollama_base_url)
         self.model_configs_dir = model_configs_dir
         self.llm_instances: Dict[str, OllamaLLM] = {}
-        self.model_configurations: Dict[str, ModelHyperparameters] = {}
+        self.model_configurations: Dict[str, ModelGenerationParams] = {}
         self.available_models: Dict[str, ModelInfo] = {}
         
         self._ensure_model_configs_directory()
@@ -25,13 +25,13 @@ class OllamaManager:
         if not os.path.exists(self.model_configs_dir):
             os.makedirs(self.model_configs_dir)
 
-    def _load_model_configuration_from_file(self, model_name: str) -> Optional[ModelHyperparameters]:
+    def _load_model_configuration_from_file(self, model_name: str) -> Optional[ModelGenerationParams]:
         """Load a model configuration from a JSON file."""
         try:
             safe_filename = self._sanitize_filename(model_name)
             with open(os.path.join(self.model_configs_dir, f"{safe_filename}.json"), "r", encoding="utf-8") as file:
                 data = json.load(file)
-                return ModelHyperparameters(**data)
+                return ModelGenerationParams(**data)
         except FileNotFoundError:
             print(f"Model configuration '{model_name}' not found.")
         except Exception as e:
@@ -55,7 +55,7 @@ class OllamaManager:
         sanitized = filename.replace(':', '_').replace('/', '_').replace('\\', '_').replace('?', '_').replace('*', '_').replace('"', '_').replace('<', '_').replace('>', '_').replace('|', '_')
         return sanitized
 
-    def _save_model_configuration_to_file(self, model_name: str, config: ModelHyperparameters):
+    def _save_model_configuration_to_file(self, model_name: str, config: ModelGenerationParams):
         """Save a model configuration to a JSON file."""
         try:
             config_dict = config.model_dump(mode='json', exclude_none=False, exclude_unset=False) 
@@ -66,24 +66,24 @@ class OllamaManager:
             print(f"Error saving model configuration '{model_name}': {e}")
             raise
 
-    def get_model_configuration(self, model_name: str) -> ModelHyperparameters:
+    def get_model_configuration(self, model_name: str) -> ModelGenerationParams:
         """Get model configuration, loading from file if not in cache."""
         if model_name not in self.model_configurations:
             config = self._load_model_configuration_from_file(model_name)
             if config:
                 self.model_configurations[model_name] = config
             else:
-                return ModelHyperparameters(ollama_model_name=model_name)
+                return ModelGenerationParams(ollama_model_name=model_name)
         return self.model_configurations[model_name]
 
-    def save_model_configuration(self, model_name: str, config: ModelHyperparameters) -> bool:
+    def save_model_configuration(self, model_name: str, config: ModelGenerationParams) -> bool:
         """Save model configuration to file and update cache."""
         try:
             config.ollama_model_name = model_name
             self._save_model_configuration_to_file(model_name, config)
             self.model_configurations[config.ollama_model_name] = config
             if (config.ollama_model_name in self.available_models):
-                self.available_models[config.ollama_model_name].hyperparameters = config
+                self.available_models[config.ollama_model_name].generation_params = config
             if config.ollama_model_name in self.llm_instances:
                 del self.llm_instances[config.ollama_model_name]
             return True
@@ -148,7 +148,7 @@ class OllamaManager:
                 )
                 model_info = ModelInfo(
                     metadata=metadata,
-                    hyperparameters=self.get_model_configuration(model.get('model', "Unknown"))
+                    generation_params=self.get_model_configuration(model.get('model', "Unknown"))
                 )
                 self.available_models[model.model] = model_info
                 model_list.append(model_info)
@@ -160,19 +160,19 @@ class OllamaManager:
     def get_model_instance(self, model_name: str) -> OllamaLLM:
         """ Get or create a LangChain Ollama LLM instance with current configuration."""
         if model_name not in self.llm_instances:
-            hyperparams = self.get_model_configuration(model_name)
+            generation_params = self.get_model_configuration(model_name)
 
             self.llm_instances[model_name] = OllamaLLM(
                 model=model_name,
                 base_url=settings.ollama_base_url,
-                temperature=hyperparams.temperature,
-                top_p=hyperparams.top_p,
-                top_k=hyperparams.top_k,
-                num_ctx=hyperparams.context_length,
-                repeat_last_n=hyperparams.repeat_last_n,
-                repeat_penalty=hyperparams.repeat_penalty,
-                num_gpu=hyperparams.gpu_count,
-                seed=hyperparams.seed,
+                temperature=generation_params.temperature,
+                top_p=generation_params.top_p,
+                top_k=generation_params.top_k,
+                num_ctx=generation_params.context_length,
+                repeat_last_n=generation_params.repeat_last_n,
+                repeat_penalty=generation_params.repeat_penalty,
+                num_gpu=generation_params.gpu_count,
+                seed=generation_params.seed,
                 verbose=settings.langchain_verbose
             )
         return self.llm_instances[model_name]

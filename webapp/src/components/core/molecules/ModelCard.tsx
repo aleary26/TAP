@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import type { ModelMetadata, ModelInfo, ModelHyperparameters } from "@/types/models";
+import type { ModelMetadata, ModelInfo, ModelGenerationParams } from "@/types/models";
 import { useModels } from '@/contexts/PlatformContext';
 import ModelInfoDisplay from './ModelInfo';
 import ModelCardActions from './ModelCardActions';
-import HyperparametersList from './HyperparametersList';
+import GenerationParamsList from './GenerationParamsList';
 
 interface ModelCardProps {
     model: ModelMetadata;
@@ -20,30 +20,30 @@ const ModelCard: React.FC<ModelCardProps> = ({
 }) => {
     const { updateModel, resetModel } = useModels();
     const [isEditing, setIsEditing] = useState(false);
-    const [editingHyperparameters, setEditingHyperparameters] = useState<ModelHyperparameters | null>(null);
+    const [editingGenerationParams, setEditingGenerationParams] = useState<ModelGenerationParams | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
     const [isResetting, setIsResetting] = useState(false);
     const [hasEditsThisSession, setHasEditsThisSession] = useState(false);
 
     const handleEdit = () => {
         if (modelInfo) {
-            setEditingHyperparameters({ ...modelInfo.hyperparameters });
+            setEditingGenerationParams({ ...modelInfo.generationParams });
             setIsEditing(true);
         }
     };
 
     const handleCancelEdit = () => {
         setIsEditing(false);
-        setEditingHyperparameters(null);
+        setEditingGenerationParams(null);
     };
 
     const handleSave = async () => {
-        if (editingHyperparameters) {
+        if (editingGenerationParams) {
             setIsUpdating(true);
             try {
-                await updateModel(model.name, editingHyperparameters);
+                await updateModel(model.name, editingGenerationParams);
                 setIsEditing(false);
-                setEditingHyperparameters(null);
+                setEditingGenerationParams(null);
                 setHasEditsThisSession(true);
             } catch (error) {
                 console.error('Failed to update model:', error);
@@ -65,10 +65,10 @@ const ModelCard: React.FC<ModelCardProps> = ({
         }
     };
 
-    const handleHyperparameterChange = (key: keyof ModelHyperparameters, value: number | undefined) => {
-        if (editingHyperparameters) {
-            setEditingHyperparameters({
-                ...editingHyperparameters,
+    const handleGenerationParamChange = (key: keyof ModelGenerationParams, value: number | undefined) => {
+        if (editingGenerationParams) {
+            setEditingGenerationParams({
+                ...editingGenerationParams,
                 [key]: value
             });
         }
@@ -104,11 +104,11 @@ const ModelCard: React.FC<ModelCardProps> = ({
             </div>
 
             {modelInfo && (
-                <HyperparametersList
-                    hyperparameters={modelInfo.hyperparameters}
+                <GenerationParamsList
+                    generationParams={modelInfo.generationParams}
                     isEditing={isEditing}
-                    editingHyperparameters={editingHyperparameters}
-                    onHyperparameterChange={handleHyperparameterChange}
+                    editingGenerationParams={editingGenerationParams}
+                    onGenerationParamChange={handleGenerationParamChange}
                 />
             )}
         </div>

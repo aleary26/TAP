@@ -58,7 +58,7 @@ export interface ApiAnalysisResponse {
     statistics: ApiAnalysisStatistics;
 }
 
-export interface ApiModelHyperparameters {
+export interface ApiModelGenerationParams {
     temperature: number;
     top_p?: number;
     top_k?: number;
@@ -82,7 +82,7 @@ export interface ApiModelMetadata {
 
 export interface ApiModelInfo {
     metadata: ApiModelMetadata;
-    hyperparameters: ApiModelHyperparameters;
+    generation_params: ApiModelGenerationParams;
 }
 
 export interface ApiModelsResponse {

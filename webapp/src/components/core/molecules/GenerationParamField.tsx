@@ -1,7 +1,7 @@
 import React from 'react';
-import HyperparameterInput from '../atoms/HyperparameterInput';
+import GenerationParamInput from '../atoms/GenerationParamInput';
 
-interface HyperparameterFieldProps {
+interface GenerationParamFieldProps {
     label: string;
     value: number | undefined;
     isEditing: boolean;
@@ -12,7 +12,7 @@ interface HyperparameterFieldProps {
     displayValue?: string;
 }
 
-const HyperparameterField: React.FC<HyperparameterFieldProps> = ({
+const GenerationParamField: React.FC<GenerationParamFieldProps> = ({
     label,
     value,
     isEditing,
@@ -33,7 +33,7 @@ const HyperparameterField: React.FC<HyperparameterFieldProps> = ({
                 {label}:
             </label>
             {isEditing && onChange ? (
-                <HyperparameterInput
+                <GenerationParamInput
                     type="number"
                     value={value || ''}
                     onChange={onChange}
@@ -50,4 +50,4 @@ const HyperparameterField: React.FC<HyperparameterFieldProps> = ({
     );
 };
 
-export default HyperparameterField; 
+export default GenerationParamField; 

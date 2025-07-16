@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Path
 from typing import Dict, Any
 
 from app.services.ollama_manager import ollama_manager
-from app.models.llm_models import ModelsResponse, ModelInfo, ModelHyperparameters, ModelResetResponse
+from app.models.llm_models import ModelsResponse, ModelInfo, ModelGenerationParams, ModelResetResponse
 
 llm_models_router = APIRouter()
 
@@ -26,7 +26,7 @@ async def get_model_configuration(
     """
     Get configuration for a specific model.
     
-    Returns the current hyperparameter configuration for the specified model.
+    Returns the current generation parameter configuration for the specified model.
     If no custom configuration exists, returns the default configuration.
     """
     try:
@@ -46,20 +46,20 @@ async def get_model_configuration(
 
 @llm_models_router.put("/models/{model_name}", response_model=ModelInfo)
 async def update_model_configuration(
-    hyperparameters: ModelHyperparameters,
+    generation_params: ModelGenerationParams,
     model_name: str = Path(..., description="Name of the model to update configuration for")
 ):
     """
-    Update hyperparameter configuration for a specific model.
+    Update generation parameter configuration for a specific model.
     
-    Saves the provided hyperparameters as the new configuration for the specified model.
+    Saves the provided generation parameters as the new configuration for the specified model.
     This will override any existing configuration for the model.
     """
     try:
         if not await ollama_manager.is_model_available(model_name):
             raise HTTPException(status_code=404, detail=f"Model '{model_name}' not found")
         
-        success = ollama_manager.save_model_configuration(model_name, hyperparameters)
+        success = ollama_manager.save_model_configuration(model_name, generation_params)
         
         if not success:
             raise HTTPException(status_code=500, detail="Failed to save model configuration")

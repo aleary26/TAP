@@ -3,7 +3,7 @@ import type {
   AnalysisResponse,
   MessageResponse,
 } from "../types/analysis";
-import type { ModelsResponse, ModelInfo, ModelHyperparameters, ModelResetResponse } from "../types/models";
+import type { ModelsResponse, ModelInfo, ModelGenerationParams, ModelResetResponse } from "../types/models";
 import type { PromptsResponse, Prompt } from "../types/prompts";
 import type {
   ApiAnalysisResponse,
@@ -23,7 +23,7 @@ import {
   transformPromptFromApi,
   transformMessageResponseFromApi,
   transformModelInfoFromApi,
-  transformModelHyperparametersToApi,
+  transformModelGenerationParamsToApi,
   transformModelResetResponseFromApi,
 } from "../utils/api-transformers";
 
@@ -98,11 +98,11 @@ export const apiService = {
     return transformModelsResponseFromApi(apiResponse);
   },
 
-  async updateModel(modelName: string, hyperparameters: ModelHyperparameters): Promise<ModelInfo> {
-    const apiHyperparameters = transformModelHyperparametersToApi(hyperparameters);
+  async updateModel(modelName: string, generationParams: ModelGenerationParams): Promise<ModelInfo> {
+    const apiGenerationParams = transformModelGenerationParamsToApi(generationParams);
     const apiResponse = await makeRequest<ApiModelInfo>(`/models/${modelName}`, {
       method: "PUT",
-      body: JSON.stringify(apiHyperparameters),
+      body: JSON.stringify(apiGenerationParams),
     });
     return transformModelInfoFromApi(apiResponse);
   },

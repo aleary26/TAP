@@ -1,8 +1,8 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
-class ModelHyperparameters(BaseModel):
-    """ Configuration settings for LLM models."""
+class ModelGenerationParams(BaseModel):
+    """ Generation parameter settings for LLM models."""
     ollama_model_name: Optional[str] = Field(None, description="Ollama model name")
     temperature: Optional[float] = Field(0.8, ge=0.0, le=1.0, description="Sampling temperature")
     top_p: Optional[float] = Field(0.9, ge=0.0, le=1.0, description="Top-p (nucleus) sampling")
@@ -27,11 +27,13 @@ class ModelMetadata(BaseModel):
 class ModelInfo(BaseModel):
     """ Information about a specific LLM model. """
     metadata: ModelMetadata = Field(default_factory=ModelMetadata, description="Model metadata")
-    hyperparameters: ModelHyperparameters = Field(default_factory=ModelHyperparameters, description="Model hyperparameters") 
+    generation_params: ModelGenerationParams = Field(default_factory=ModelGenerationParams, description="Model generation parameters") 
 
 class ModelsResponse(BaseModel):
     """Response containing available models."""
-    models: List[ModelInfo] = Field(..., description="List of available models") 
+    models: List[ModelInfo] = Field(..., description="List of available models")
+
+ 
 
 class ModelResetResponse(BaseModel):
     """Response containing the result of a model reset."""
