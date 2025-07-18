@@ -108,7 +108,7 @@ const GenerationParamsList: React.FC<GenerationParamsListProps> = ({
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
                     <Settings size={16} className="text-blue-600" />
-                    <span className="text-blue-900">Generation Params</span>W
+                    <span className="text-blue-900">Generation Params</span>
                 </div>
                 {hasMoreFields && !isEditing && (
                     <button
